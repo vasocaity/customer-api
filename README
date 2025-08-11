@@ -1,0 +1,43 @@
+# Customer API (Gin + Golang + PostgreSQL + UUID)
+
+A simple **CRUD API** for managing customers, built with [Golang](https://golang.org/), [Gin](https://gin-gonic.com/), and [PostgreSQL](https://www.postgresql.org/).  
+This project uses **UUID** as the primary key and reads configuration from `.env`.
+
+---
+
+## 📌 Features
+- Create, Read, Update, Delete Customers
+- UUID as primary key
+- PostgreSQL database
+- Read config from `.env`
+- Auto-reload with Docker bind mount
+
+---
+
+## 📂 Project Structure
+
+├── config/
+│   └── config.go       # Load .env configuration
+├── models/
+│   └── customer.go     # Customer model (UUID primary key)
+├── handlers/
+│   └── customer.go     # CRUD handlers
+├── main.go             # Application entry point
+├── go.mod
+├── go.sum
+├── .env
+├── Dockerfile
+└── docker-compose.yml
+
+---
+
+## ⚙️ Requirements
+- Go 1.24+
+- PostgreSQL
+- Docker & Docker Compose
+
+---
+## Create .env file
+
+`DATABASE_URI=host=postgres user=postgres password=postgres dbname=mydb port=5432 sslmode=disable TimeZone=Asia/Bangkok
+PORT=8080`
