@@ -41,14 +41,16 @@ func (r *repository) GetByID(id uuid.UUID) (*model.Customer, error) {
 // List implements CustomerRepository.
 func (r *repository) List(query string, limit int, offset int) ([]model.Customer, error) {
 	var list []model.Customer
-	err := r.db.
+	// search := "%" + query + "%"
+	//, "name LIKE ? OR email LIKE ?", search, search
+	result := r.db.
 		Order("name asc").
 		Limit(limit).
 		Offset(offset).
-		Find(&list, "name LIKE '%?%' OR email LIKE '%?%'", query, query)
+		Find(&list)
 
-	if err != nil {
-		return nil, err.Error
+	if result.Error != nil {
+		return nil, result.Error
 	}
 	return list, nil
 }

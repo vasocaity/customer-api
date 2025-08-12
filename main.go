@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -35,10 +36,17 @@ func main() {
 
 	// Middleware
 	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{"Origin"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+	}))
 
 	customer := r.Group("customers")
 	customer.POST("", cusHandler.CreateCustomer)
-	customer.GET("/:id", cusHandler.Get)
+	customer.GET("/:id", cusHandler.GetByID)
+	customer.GET("", cusHandler.Get)
+	customer.DELETE("/:id", cusHandler.DeleteByID)
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -3,6 +3,7 @@ package service
 import (
 	"customer-api/pkg/model"
 	"customer-api/pkg/repository"
+	"log"
 
 	"github.com/google/uuid"
 )
@@ -62,6 +63,10 @@ func (s *service) Get(id uuid.UUID) (*model.Customer, error) {
 
 // List implements CustomerService.
 func (s *service) List(query string, limit int, offset int) ([]model.Customer, error) {
+	if limit == 0 {
+		limit = 10
+	}
+	log.Default().Printf("limit: %d", limit)
 	return s.repo.List(query, limit, offset)
 }
 

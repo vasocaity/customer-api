@@ -8,7 +8,7 @@ import (
 )
 
 type Customer struct {
-	ID        uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	ID        uuid.UUID      `json:"id" gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name      string         `json:"name" gorm:"size:255;not null"`
 	Email     string         `json:"email" gorm:"size:255; uniqueIndex;not null"`
 	Phone     string         `json:"phone" gorm:"size:50"`
