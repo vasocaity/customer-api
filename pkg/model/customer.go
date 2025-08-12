@@ -15,4 +15,7 @@ type Customer struct {
 	CreatedAt time.Time      `json:"createdAt"`
 	UpdatedAt time.Time      `json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+
+	Feedbacks    []Feedback    `gorm:"foreignKey:CustomerID"`
+	Interactions []Interaction `gorm:"foreignKey:CustomerID"`
 }

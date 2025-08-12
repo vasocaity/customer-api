@@ -25,7 +25,11 @@ func main() {
 	database := db.NewPostgresDB()
 
 	// Auto migrate
-	if err := database.AutoMigrate(&model.Customer{}); err != nil {
+	if err := database.AutoMigrate(&model.Customer{},
+		&model.Product{},
+		&model.Feedback{},
+		&model.Interaction{},
+	); err != nil {
 		log.Fatalf("Migrate failed: %v", err)
 	}
 
