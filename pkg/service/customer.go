@@ -32,6 +32,23 @@ type UpdateCustomerRequest struct {
 	Phone *string `json:"phone"`
 }
 
+type CustomerResponse struct {
+	Name      string             `json:"name"`
+	Email     string             `json:"email"`
+	Phone     string             `json:"phone"`
+	Feedbacks []FeedbackResponse `json:"feedbacks"`
+}
+
+type FeedbackResponse struct {
+	ProductName string            `json:"productName"`
+	Comments    []CommentResponse `json:"comments"`
+}
+
+type CommentResponse struct {
+	Comment string `json:"comment"`
+	Rating  int    `json:"rating"`
+}
+
 // Create implements CustomerService.
 func (s *service) Create(req *CreateCustomerRequest) (*model.Customer, error) {
 	c := &model.Customer{

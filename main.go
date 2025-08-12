@@ -36,7 +36,9 @@ func main() {
 	// inject dependencies
 	cusRepo := repository.NewRepository(database)
 	cusService := service.NewService(cusRepo)
-	cusHandler := handler.NewCustomerHandler(cusService)
+	productRepository := repository.NewProductRepository(database)
+	cusHandler := handler.NewCustomerHandler(cusService, productRepository)
+	feedbackHandler := handler.NewFeedbackHandler(database)
 
 	// Middleware
 	r.Use(gin.Logger(), gin.Recovery())
@@ -48,11 +50,20 @@ func main() {
 	}))
 
 	customer := r.Group("customers")
+	customer.GET("", cusHandler.Get)
 	customer.POST("", cusHandler.CreateCustomer)
 	customer.DELETE("/:id", cusHandler.DeleteByID)
 	customer.PUT("/:id", cusHandler.UpdateByID)
-	customer.GET("", cusHandler.Get)
 	customer.GET("/:id", cusHandler.GetByID)
+
+	feedbackGroup := r.Group("/feedbacks")
+	{
+		feedbackGroup.POST("", feedbackHandler.CreateFeedback)
+		feedbackGroup.GET("", feedbackHandler.ListFeedbacks)
+		feedbackGroup.GET("/:id", feedbackHandler.GetFeedback)
+		feedbackGroup.PUT("/:id", feedbackHandler.UpdateFeedback)
+		feedbackGroup.DELETE("/:id", feedbackHandler.DeleteFeedback)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"customer-api/pkg/repository"
 	"customer-api/pkg/service"
 	"net/http"
 	"strconv"
@@ -11,14 +12,16 @@ import (
 )
 
 type CustomerHandler struct {
-	svc      service.CustomerService
-	validate *validator.Validate
+	svc         service.CustomerService
+	validate    *validator.Validate
+	productRepo repository.ProductRepository
 }
 
-func NewCustomerHandler(svc service.CustomerService) *CustomerHandler {
+func NewCustomerHandler(svc service.CustomerService, productRepo repository.ProductRepository) *CustomerHandler {
 	return &CustomerHandler{
-		svc:      svc,
-		validate: validator.New(),
+		svc:         svc,
+		validate:    validator.New(),
+		productRepo: productRepo,
 	}
 }
 
@@ -82,8 +85,43 @@ func (h *CustomerHandler) Get(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	var responses []service.CustomerResponse
 
-	c.JSON(http.StatusOK, cuts)
+	for _, v := range cuts {
+		var feedbackResponse []service.FeedbackResponse
+		uniqueProduct := make(map[uuid.UUID][]service.CommentResponse)
+		productName := make(map[uuid.UUID]string)
+		for _, f := range v.Feedbacks {
+			p, productErr := h.productRepo.GetByID(f.ProductID)
+			if productErr != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": productErr.Error()})
+				return
+			}
+			productName[p.ID] = p.Name
+			uniqueProduct[p.ID] = append(uniqueProduct[p.ID], service.CommentResponse{
+				Comment: f.Comment,
+				Rating:  f.Rating,
+			})
+		}
+
+		for i, v := range uniqueProduct {
+			feedbackResponse = append(feedbackResponse, service.FeedbackResponse{
+				ProductName: productName[i],
+				Comments:    v,
+			})
+		}
+
+		customerResponse := service.CustomerResponse{
+			Name:      v.Name,
+			Email:     v.Email,
+			Phone:     v.Phone,
+			Feedbacks: feedbackResponse,
+		}
+
+		responses = append(responses, customerResponse)
+	}
+
+	c.JSON(http.StatusOK, responses)
 }
 
 func (h *CustomerHandler) GetByID(c *gin.Context) {
