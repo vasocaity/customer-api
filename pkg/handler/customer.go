@@ -44,6 +44,34 @@ func (h *CustomerHandler) CreateCustomer(c *gin.Context) {
 	c.JSON(http.StatusCreated, created)
 }
 
+func (h *CustomerHandler) UpdateByID(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	var req service.UpdateCustomerRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.validate.Struct(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	cust, err := h.svc.Update(id, &req)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, cust)
+}
+
 func (h *CustomerHandler) Get(c *gin.Context) {
 	keyword := c.Query("keyword")
 	limit, _ := strconv.Atoi(c.Query("limit"))

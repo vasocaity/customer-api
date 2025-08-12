@@ -41,16 +41,18 @@ func main() {
 	// Middleware
 	r.Use(gin.Logger(), gin.Recovery())
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"*"},
-		AllowHeaders: []string{"Origin"},
-		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowOrigins:  []string{"*"},
+		AllowHeaders:  []string{"Origin", "Content-Type", "Authorization"},
+		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		ExposeHeaders: []string{"Content-Length"},
 	}))
 
 	customer := r.Group("customers")
 	customer.POST("", cusHandler.CreateCustomer)
-	customer.GET("/:id", cusHandler.GetByID)
-	customer.GET("", cusHandler.Get)
 	customer.DELETE("/:id", cusHandler.DeleteByID)
+	customer.PUT("/:id", cusHandler.UpdateByID)
+	customer.GET("", cusHandler.Get)
+	customer.GET("/:id", cusHandler.GetByID)
 
 	port := os.Getenv("PORT")
 	if port == "" {
