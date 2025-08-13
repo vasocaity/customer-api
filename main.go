@@ -3,6 +3,7 @@ package main
 import (
 	"customer-api/pkg/db"
 	"customer-api/pkg/handler"
+	"customer-api/pkg/messaging"
 	"customer-api/pkg/model"
 	"customer-api/pkg/repository"
 	"customer-api/pkg/service"
@@ -64,6 +65,12 @@ func main() {
 		feedbackGroup.PUT("/:id", feedbackHandler.UpdateFeedback)
 		feedbackGroup.DELETE("/:id", feedbackHandler.DeleteFeedback)
 	}
+
+	kafkaHandler := handler.NewKafkaHandler([]string{"kafka:9092"}, "my-topic")
+	defer kafkaHandler.Close()
+	r.POST("/publish", kafkaHandler.Publish)
+
+	go messaging.NewSub()
 
 	port := os.Getenv("PORT")
 	if port == "" {
